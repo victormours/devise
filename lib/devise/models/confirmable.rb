@@ -262,6 +262,10 @@ module Devise
         def postpone_email_change_until_confirmation_and_regenerate_confirmation_token
           @reconfirmation_required = true
           self.unconfirmed_email = self.email
+          if Devise::Orm.active_record?(self.class) # ActiveRecord
+            unconfirmed_email_will_change! # Forces writing unconfirmed_email to the database
+          end
+
           self.email = self.devise_email_in_database
           self.confirmation_token = nil
           generate_confirmation_token
